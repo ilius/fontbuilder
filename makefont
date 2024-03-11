@@ -5,17 +5,17 @@
 # Works only on linux.
 #
 # Requirements:
-#     build.py
-#     ttfautohint
-#     sfnt2woff
-#     ttf2eot
-#     woff2_compress
-#     zip
+#		 build.py
+#		 ttfautohint
+#		 sfnt2woff
+#		 ttf2eot
+#		 woff2_compress
+#		 zip
 #
 
 if [ ! -f "build.conf" ]; then
-    echo "build.conf not found!"
-    exit 1
+		echo "build.conf not found!"
+		exit 1
 fi
 
 source build.conf
@@ -29,13 +29,13 @@ BUILDCMD="${SCRIPTDIR}"/build.py
 LATINCOPYRIGHT="${LATINCOPYRIGHT}"
 
 if [ ! -f "${BUILDCMD}" ]; then
-    echo "BUILDCMD not found!"
-    exit 1
+		echo "BUILDCMD not found!"
+		exit 1
 fi
 
 if [ ! -d "${SOURCEDIR}" ]; then
-    echo "SOURCEDIR not found!"
-    exit 1
+		echo "SOURCEDIR not found!"
+		exit 1
 fi
 
 rm -rf "${TEMPDIR}"
@@ -43,37 +43,38 @@ mkdir -p "${TEMPDIR}"
 mkdir "${TEMPDIR}"/build
 
 if [ ! -d "${TEMPDIR}"/build ]; then
-    echo "TEMPDIR/build not found!"
-    exit 1
+		echo "TEMPDIR/build not found!"
+		exit 1
 fi
 
 # Make all the possible versions
 for ((i=0;i<${#SOURCEFILES[@]};++i));
 do
-  sf="$SOURCEDIR"/"${SOURCEFILES[i]}"
-  lf="${LATINDIR}"/"${LATINFILES[i]}"
-  bn=$(basename ${sf})
-  filename="${bn%.*}"
-  if [ -f ${sf} ]; then  
-    "${BUILDCMD}" --input="${sf}" --output="${TEMPDIR}"/build/$filename-WOL.ttf
-    "${BUILDCMD}" --input="${sf}" --output="${TEMPDIR}"/build/$filename-FD-WOL.ttf --farsi-digits
-    if [ -f ${lf} ]; then  
-      "${BUILDCMD}" --input="${sf}" --latin="${lf}" --latin-copyright="${LATINCOPYRIGHT}" --output="${TEMPDIR}"/build/$filename.ttf
-      "${BUILDCMD}" --input="${sf}" --latin="${lf}" --latin-copyright="${LATINCOPYRIGHT}" --output="${TEMPDIR}"/build/$filename-FD.ttf --farsi-digits
-    fi
-  fi 
+	sf="$SOURCEDIR"/"${SOURCEFILES[i]}"
+	lf="${LATINDIR}"/"${LATINFILES[i]}"
+	bn=$(basename ${sf})
+	filename="${bn%.*}"
+	if [ -f ${sf} ]; then	
+		"${BUILDCMD}" --input="${sf}" --output="${TEMPDIR}"/build/$filename-WOL.ttf
+		"${BUILDCMD}" --input="${sf}" --output="${TEMPDIR}"/build/$filename-FD-WOL.ttf --farsi-digits
+		if [ -f ${lf} ]; then	
+			"${BUILDCMD}" --input="${sf}" --latin="${lf}" --latin-copyright="${LATINCOPYRIGHT}" --output="${TEMPDIR}"/build/$filename.ttf
+			"${BUILDCMD}" --input="${sf}" --latin="${lf}" --latin-copyright="${LATINCOPYRIGHT}" --output="${TEMPDIR}"/build/$filename-FD.ttf --farsi-digits
+		fi
+	fi 
 done
 
 # Make all file types
 for f in "${TEMPDIR}"/build/*.ttf
 do
-  if [ -f "${f}" ]; then
-    fn=$(basename "${f}")
-    ttfautohint -n -w D -W -D arab -f latn -G 11 -l 8 -r 11 "${f}" "${TEMPDIR}/${fn}"
-    sfnt2woff "${TEMPDIR}/${fn}"
-    ttf2eot "${TEMPDIR}/${fn}" > "${TEMPDIR}/${fn%%.*}".eot
-    woff2_compress "${TEMPDIR}/${fn}"
-  fi 
+	if [ -f "${f}" ]; then
+		echo "$f"
+		fn=$(basename "${f}")
+		ttfautohint -n -a qqs -W -D arab -f latn -G 11 -l 8 -r 11 "${f}" "${TEMPDIR}/${fn}"
+		sfnt2woff "${TEMPDIR}/${fn}"
+		ttf2eot "${TEMPDIR}/${fn}" > "${TEMPDIR}/${fn%%.*}".eot
+		woff2_compress "${TEMPDIR}/${fn}"
+	fi 
 done
 rm -rf "${TEMPDIR}"/build
 
@@ -90,14 +91,14 @@ mv "${TEMPDIR}"/*WOL* "${TEMPDIR}"/Without-Latin
 # Add other(license, readme, ...) files defined in build.conf
 for ((i=0;i<${#ADDFILES[@]};++i));
 do
-  cp "${ADDFILES[i]}" "${TEMPDIR}"
+	cp "${ADDFILES[i]}" "${TEMPDIR}"
 done
 
 # Make variable
 if [ -d "variable" ]; then
-  cd variable/
-  ./makevariable.sh "${TEMPDIR}"
-  cd ..
+	cd variable/
+	./makevariable.sh "${TEMPDIR}"
+	cd ..
 fi
 
 # Make the release package(zip)
@@ -108,6 +109,7 @@ zip -r release.zip .
 cd "$CURDIR"
 mv "${TEMPDIR}"/release.zip "$RELEASEFILEPATH"
 
+set -x
 # Make folder "dist"
 mkdir -p "${DISTDIR}"
 cp -rf "${TEMPDIR}"/**/ "${DISTDIR}"
