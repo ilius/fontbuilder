@@ -27,3 +27,12 @@ Thanks [github.com/alif-type/amiri](https://github.com/alif-type/amiri) for his 
 The common or standard way (Make file) is what you could see in [https://github.com/bateni/qalam-tarash](https://github.com/bateni/qalam-tarash). Maybe we should switch to that repo.
 
 License: MIT
+
+## Dependencies
+
+### On Debian-based
+
+    sudo apt install python3-fontforge ttfautohint woff-tools woff2
+
+Also download and build [ttf2eot](https://github.com/thoroc/ttf2eot)
+
